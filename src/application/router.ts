@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import * as fs from "fs";
 import * as path from "path";
-// import * as controller from "./controller";
+import * as controller from "./controller";
 
 export const router: Router = Router();
 
@@ -36,10 +36,10 @@ router.post("/", async (req: Request, resp: Response) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const jsObjects: Object[] = JSON.parse(contents);
-                    console.log(typeof jsObjects);
-                    jsObjects.push(req.body);
-                    resolve(jsObjects);
+                    const elements: Object = JSON.parse(contents);
+                    const { id } = req.body;
+                    elements[id] = req.body;
+                    resolve(elements);
                 }
             },
         );
@@ -50,7 +50,7 @@ router.post("/", async (req: Request, resp: Response) => {
                 path.join(__dirname, "../../storage.json"),
                 0,
                 (err: Error) => {
-                    err ? reject(err) : resolve(dataToWrite), console.log("truncated");
+                    err ? reject(err) : resolve(dataToWrite);
                 },
             );
         });
@@ -78,4 +78,17 @@ router.post("/", async (req: Request, resp: Response) => {
  * @apiSuccess {String} firstname Firstname of the User.
  * @apiSuccess {String} lastname  Lastname of the User.
  */
-// router.get("/:id", controller.getValueById);
+router.get("/:id", controller.getElementById);
+
+/**
+ * @api {delete} / Request User information
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} firstname Firstname of the User.
+ * @apiSuccess {String} lastname  Lastname of the User.
+ */
+
+router.delete("/:id", controller.deleteById);
